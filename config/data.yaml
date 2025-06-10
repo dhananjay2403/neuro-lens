@@ -1,0 +1,13 @@
+# This file tells YOLOv8 where to find your dataset & what classes it’s detecting
+
+# Train images
+train: /Users/dhananjaytiwari/Desktop/Programming/CODING/PROJECTS/neuro-lens/data/train/images
+
+# Validation images
+val: /Users/dhananjaytiwari/Desktop/Programming/CODING/PROJECTS/neuro-lens/data/valid/images
+
+# Number of classes
+nc: 3
+
+# Class names
+names: ['glioma', 'meningioma', 'pituitary']

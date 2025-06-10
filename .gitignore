@@ -1,0 +1,38 @@
+# Virtual Environment
+.venv/
+
+# Dr.Shreeni YT Video codes
+Dr.Shreeni Brain Tumor U-Net Tut
+
+# Dataset
+data
+
+# macOS system files
+.DS_Store
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code settings
+.vscode/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.bak
+
+# Environment files
+.env
+.env.*
+
+# Other system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
