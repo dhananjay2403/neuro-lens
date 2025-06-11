@@ -1,27 +1,17 @@
-# https://youtu.be/ScdCQqLtnis
-"""
-Define your 3D Unit
-
-I converted my standard 2D Unet to 3D. 
-
-"""
-
-from keras.models import Model
-from keras.layers import Input, Conv3D, MaxPooling3D, concatenate, Conv3DTranspose, BatchNormalization, Dropout, Lambda
-from keras.optimizers import Adam
-from keras.metrics import MeanIoU
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Conv3D, MaxPooling3D, concatenate, Conv3DTranspose, BatchNormalization, Dropout, Lambda
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import MeanIoU
 
 kernel_initializer =  'he_uniform' #Try others if you want
 
-
-################################################################
 def simple_unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_DEPTH, IMG_CHANNELS, num_classes):
-#Build the model
+    
+    # Build the model
     inputs = Input((IMG_HEIGHT, IMG_WIDTH, IMG_DEPTH, IMG_CHANNELS))
-    #s = Lambda(lambda x: x / 255)(inputs)   #No need for this if we normalize our inputs beforehand
     s = inputs
 
-    #Contraction path
+    # Contraction path
     c1 = Conv3D(16, (3, 3, 3), activation='relu', kernel_initializer=kernel_initializer, padding='same')(s)
     c1 = Dropout(0.1)(c1)
     c1 = Conv3D(16, (3, 3, 3), activation='relu', kernel_initializer=kernel_initializer, padding='same')(c1)
@@ -46,7 +36,7 @@ def simple_unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_DEPTH, IMG_CHANNELS, num_classe
     c5 = Dropout(0.3)(c5)
     c5 = Conv3D(256, (3, 3, 3), activation='relu', kernel_initializer=kernel_initializer, padding='same')(c5)
     
-    #Expansive path 
+    # Expansion path 
     u6 = Conv3DTranspose(128, (2, 2, 2), strides=(2, 2, 2), padding='same')(c5)
     u6 = concatenate([u6, c4])
     c6 = Conv3D(128, (3, 3, 3), activation='relu', kernel_initializer=kernel_initializer, padding='same')(u6)
@@ -79,7 +69,9 @@ def simple_unet_model(IMG_HEIGHT, IMG_WIDTH, IMG_DEPTH, IMG_CHANNELS, num_classe
     
     return model
 
-#Test if everything is working ok. 
+# Sanity check
 model = simple_unet_model(128, 128, 128, 3, 4)
+
 print(model.input_shape)
+
 print(model.output_shape)
