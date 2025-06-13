@@ -1,12 +1,13 @@
 # This file tells YOLOv8 where to find your dataset & what classes it’s detecting
 
 # Train images
-train: /Users/dhananjaytiwari/Desktop/Programming/CODING/PROJECTS/neuro-lens/data/train/images
+train: /kaggle/input/medical-image-dataset-brain-tumor-detection/BrainTumor/BrainTumorYolov8/train/images
 
 # Validation images
-val: /Users/dhananjaytiwari/Desktop/Programming/CODING/PROJECTS/neuro-lens/data/valid/images
+val: /kaggle/input/medical-image-dataset-brain-tumor-detection/BrainTumor/BrainTumorYolov8/valid/images
+test: /kaggle/input/medical-image-dataset-brain-tumor-detection/BrainTumor/BrainTumorYolov8/test/images
 
-# Number of classes
+# Validation images
 nc: 3
 
 # Class names
