@@ -2,38 +2,48 @@
 
 **DRDO INMAS Summer Research Internship Project**  
 **Mentor:** Sh. Rajesh Kumar Tiwari  
-**Date:** June 2025
+**Date:** 1st June - 30th June 2025
 
 ---
 
-## 🌟 Overview
+## Overview
 
-An end-to-end deep learning solution for automated brain tumor detection and segmentation in MRI scans using advanced CNN architectures and YOLOv8, developed during my research internship at DRDO-INMAS.
+An end-to-end deep learning solution for automated brain tumor detection and segmentation in MRI scans, developed during my research internship at DRDO-INMAS.
 
-This project aims to accelerate and support radiological workflows by leveraging both 2D and 3D MRI datasets and deploying scalable, metric-driven AI pipelines.
+This project aims to accelerate and support radiological workflows by leveraging both 2D and 3D MRI datasets and deploying scalable, metric-driven AI pipelines. The pipeline consists of initial detection using YOLOv8, followed by semantic segmentation using 3D U-Net on multimodal volumetric MRI data, with results visualized through a Streamlit web interface.
+
+---
+
+## 🏗️ Architecture
+
+![Brain Tumor Detection and Segmentation Pipeline](img/Full_Architecture.png)
+
+The architecture shows the complete pipeline from data ingestion through detection, segmentation, and visualization. The workflow follows a progressive approach, starting with initial detection using YOLOv8 on 2D slices, followed by 3D segmentation with U-Net, and finally presenting the results through an interactive Streamlit interface.
 
 ---
 
 ## 🛠️ Technologies Used
 
 - **Programming Languages:** Python
-- **Deep Learning Frameworks:** TensorFlow, Keras
-- **Object Detection & Segmentation:** YOLOv8 (Ultralytics)
-- **Data Augmentation:** Albumentations
-- **Medical Imaging Tools:** 3D Slicer, ITK-SNAP, SimpleITK
+- **Detection Frameworks:** YOLOv8 (Ultralytics)
+- **Segmentation Frameworks:** TensorFlow, Keras (for 3D U-Net)
+- **Data Augmentation:** MONAI
+- **Medical Imaging Tools:** ITK-SNAP, Nibabel
 - **Visualization Libraries:** Matplotlib, Seaborn
-- **Image Processing:** OpenCV
-- **Data Handling:** Nibabel, Pandas, NumPy
-- **Model Deployment:** ONNX Runtime, Flask (prototype)
+- **Image Processing:** OpenCV, SimpleITK
+- **Web Interface:** Streamlit
+- **Data Handling:** Pandas, NumPy
 
 ---
 
 ## 📊 Key Features
 
-- Multi-stage detection pipeline: Bounding Box → Segmentation → Enhanced Analysis
-- Support for both 2D (Kaggle) and 3D (BraTS) MRI datasets
-- Integration of clinical workflow considerations
-- Comprehensive performance benchmarking and comparative analysis
+- Multi-stage pipeline: Detection (YOLOv8) → Segmentation (3D U-Net)
+- Support for both 2D (Kaggle) and 3D (BraTS 2020) MRI datasets
+- Preprocessing pipeline for medical imaging data (normalization, mask reclassification)
+- Multimodal analysis combining FLAIR, T1ce, and T2 sequences
+- Clinical workflow integration and benchmarking
+- Streamlit-based visualization and deployment
 
 ---
 
@@ -42,158 +52,178 @@ This project aims to accelerate and support radiological workflows by leveraging
 ### Primary Datasets
 
 | Dataset      | Modalities             | Samples | Key Features                  |
-|--------------|-----------------------|---------|-------------------------------|
-| BraTS 2020   | T1, T1Gd, T2, FLAIR   | 369     | 3D volumes, expert annotations|
-| Kaggle MRI   | T2-weighted           | 2,176   | 4 tumor classes, pre-annotated|
-
-**Manual Annotations:** Used for learning and validation, stored separately in `data/manual_annotations`.
-
-### NIfTI Handling
-
-| Tool/Package      | Purpose                         |
-|-------------------|---------------------------------|
-| 3D Slicer/ITK-SNAP| Visualize .nii files on macOS   |
-| nibabel (Python)  | Programmatic data loading       |
-| SimpleITK         | Advanced preprocessing          |
-
----
-
-## 🛠️ Tech Stack
-
-- Python, TensorFlow, Keras, OpenCV, YOLOv8 (Ultralytics)
-- Data Augmentation: Albumentations (flips, rotations, etc.)
-- Visualization: Matplotlib, Seaborn
-- Medical Imaging: 3D Slicer, SimpleITK
+|--------------|------------------------|---------|-------------------------------|
+| Kaggle MRI   | T2-weighted            | 2,176   | 2D slices, 3 tumor types ([Kaggle Link](https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-detection)) |
+| BraTS 2020   | T1, T1CE, T2, FLAIR    | 369     | Multimodal 3D volumes with ground-truth segmentations ([BraTS 2020 Dataset on Kaggle](https://www.kaggle.com/datasets/awsaf49/brats20-dataset-training-validation)) |
 
 ---
 
 ## 🧠 Progressive Model Development
 
-### Phase 1: YOLOv8 Detection
+### ✅ Stage 1: Tumor Detection with YOLOv8
 
-- Adamax optimizer, 640x640 input, batch size 16
-- Augmentations: rotation (±15°), HSV adjust (±10%), Mosaic9
-- Target Metrics: mAP@50 ≥ 89%, Precision ≥ 90%
+- Model: YOLOv8m
+- Dataset: [Kaggle Brain Tumor Detection MRI Dataset](https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-detection)
+- Tumor Types: Glioma, Meningioma, Pituitary
+- Image Size: 640x640
+- Optimizer: Adamax
+- Augmentations: Mosaic, HSV, rotation
 
-### Phase 2: YOLOv8 Segmentation
+**Final Metrics on Validation Set:**
 
-- Architecture: YOLOv8x-seg
-- Key Parameters:  
-  - `mask_ratio: 4`
-  - `overlap_mask: True`
-  - `box_loss: CIoU`
+- **mAP@50:** 91.4%
+- **Precision:** 90.8%
+- **Recall:** 86.5%
 
-### Phase 3: Enhanced Architectures
-
-| Model Variant | Key Features                    | Target Dice |
-|---------------|---------------------------------|-------------|
-| BGF-YOLO      | Bi-level attention, GFPN        | 0.87        |
-| VT-UNet       | Transformer + CNN fusion        | 0.92        |
-| YOLOv8-DEC    | SnakeConv, CARAFE upsampling    | 0.89        |
+> 🎯 Tumor-wise Breakdown:
+>
+> - Glioma: mAP@50 = 0.812
+> - Meningioma: mAP@50 = 0.973
+> - Pituitary: mAP@50 = 0.955
 
 ---
 
-## 📈 Performance Benchmarks
+### 🧠 Stage 2: 3D Semantic Segmentation with 3D U-Net
 
-| Model      | mAP@50 | Dice Score | Inference Time (ms) |
-|------------|--------|------------|---------------------|
-| YOLOv8n    | 0.78   | -          | 28                  |
-| YOLOv8x    | 0.91   | 0.85       | 58                  |
-| VT-UNet    | -      | 0.92       | 112                 |
+- Dataset: BraTS 2020 (multimodal MRI volumes)
+- Modalities: T1, T1Gd, T2, FLAIR
+- Architecture: **3D U-Net**
+- Preprocessing:
+  - Intensity normalization
+  - NIfTI handling with `nibabel`
+  - Mask reclassification (4→3 classes)
+  - Slice orientation unification
+  - Cropping to focus on brain region
+- Data Augmentation:
+  - Custom 3D augmentation
+  - MONAI-based transforms
+- Model Training:
+  - Loss Function: Dice + Focal Loss
+  - Optimizer: Adam
+  - Callbacks: Early stopping, LR reduction
+  - Data Split: 80:20 training/validation
+  - Metrics: MeanIoU, Accuracy
+- Expected Outcome: Class-wise tumor segmentation masks with Dice ≥ 0.85
 
-- **YOLOv8x-seg** achieved 91.3% mAP@50 on BraTS validation
-- **VT-UNet** showed best Dice (0.916) for enhancing tumor
-- Manual vs. model annotation discrepancy: 12.7% boundary variance
+---
+
+## 📈 Benchmark Goals
+
+| Stage       | Model         | Metric        | Target     | Current    |
+|-------------|---------------|---------------|------------|------------|
+| Detection   | YOLOv8m       | mAP@50        | ≥ 0.90     | 0.914      |
+|             |               | Precision     | ≥ 0.92     | 0.908      |
+| Segmentation| 3D U-Net      | Dice Score    | ≥ 0.85     | 0.83       |
+|             |               | HD95 (mm)     | ≤ 3.5      | 3.8        |
+|             |               | Inference Time| ≤ 60 ms    | 55 ms      |
+
+### BraTS Segmentation Performance by Region
+
+| Subregion       | Dice (Mean) | IoU (Mean) | Target Dice |
+|-----------------|-------------|------------|-------------|
+| Enhancing Tumor | 0.79        | 0.70       | 0.85        |
+| Tumor Core      | 0.83        | 0.74       | 0.90        |
+| Whole Tumor     | 0.87        | 0.79       | 0.92        |
+
+---
+
+## 🚀 Workflow
+
+### Data Preprocessing
+
+1. **Loading & Initial Processing**
+   - Load NIfTI files using `nibabel`
+   - Extract multiple modalities (FLAIR, T1ce, T2)
+   - Normalize intensity values per modality
+   - Reclassify mask labels for segmentation (4→3 classes)
+
+2. **Augmentation Pipeline**
+   - Custom data generator for 3D volumes
+   - MONAI-based transforms for medical image augmentation
+   - Combine modalities for multimodal input
+
+3. **Training Pipeline**
+   - Model: 3D U-Net with TensorFlow/Keras
+   - Loss: Combination of Dice and Focal loss
+   - Optimizer: Adam with learning rate scheduling
+   - Callbacks: Early stopping, model checkpointing, TensorBoard logging
+
+4. **Inference & Visualization**
+   - Load saved model from Kaggle or local storage
+   - Process new MRI volumes through the pipeline
+   - Visualize results with overlay of segmentation masks
+   - Deploy through Streamlit web interface
 
 ---
 
 ## 🗂 Project Structure
 
-```
-brain_tumor_detection_project/
+```bash
+neuro-lens/
 ├── data/
-│   ├── raw/
-│   │   ├── kaggle_dataset/
-│   │   ├── brats_2020/
-│   │   └── manual_annotations/
-│   ├── processed/
-│   │   ├── train/
-│   │   ├── val/
-│   │   └── test/
-│   └── augmented/
-├── configs/
-├── models/
-│   ├── yolov8_detection/
-│   ├── yolov8_segmentation/
-│   ├── enhanced_yolo/
-│   ├── unet_variants/
-│   └── hybrid_models/
-├── src/
-│   ├── data_preprocessing/
-│   ├── model_training/
-│   ├── evaluation/
-│   ├── visualization/
-│   └── utils/
-├── experiments/
-│   ├── exp_001_yolo_detection/
-│   ├── exp_002_yolo_segmentation/
-│   ├── exp_003_enhanced_architectures/
-│   └── exp_004_hybrid_approaches/
-├── results/
-│   ├── metrics/
-│   ├── visualizations/
-│   └── comparative_analysis/
-├── documentation/
-│   ├── literature_review/
-│   ├── methodology/
-│   └── progress_reports/
-└── deployment/
-    ├── model_inference/
-    └── web_interface/
+│   ├── train/          # Training data
+│   │   ├── images/     # Input MRI images
+│   │   └── labels/     # Segmentation masks
+│   ├── valid/          # Validation data
+│   └── test/           # Test data
+├── notebooks/
+│   ├── 1_BraTS_data_preprocessing.ipynb
+│   ├── 2_custom_data_generator.ipynb
+│   ├── 3_model_training_&_prediction.ipynb
+│   └── yolov8_detection.ipynb
+├── config/             # Configuration files
+├── docs/               # Documentation
+├── results/            # Model outputs and visualizations
+├── simple_3d_unet.py   # 3D U-Net model definition
+└── requirements.txt    # Project dependencies
 ```
 
 ---
 
-## 🚀 Implementation Timeline
+## 🚀 Getting Started
 
-**Week 1: Foundation**  
-- [ ] BraTS 2020 preprocessing pipeline  
-- [ ] Manual annotation of 50 MRIs (T1Gd only)  
-- [ ] Radiologist workflow documentation  
+### Prerequisites
 
-**Week 2: Detection**  
-- [ ] YOLOv8n/s/m/l/x comparative study  
-- [ ] mAP@50-95 analysis across tumor sizes  
+- Python 3.8+
+- CUDA-compatible GPU (recommended for training)
 
-**Week 3: Segmentation**  
-- [ ] YOLOv8-seg vs U-Net ablation study  
-- [ ] Hybrid SAM implementation  
+### Installation
 
-**Week 4: Analysis**  
-- [ ] Statistical significance testing (p<0.05)  
-- [ ] Clinical relevance assessment  
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/neuro-lens.git
+cd neuro-lens
 
----
+# Install dependencies
+pip install -r requirements.txt
+```
 
-## 🏆 Evaluation Metrics
+### Training
 
-| Metric              | Detection Target | Segmentation Target |
-|---------------------|------------------|---------------------|
-| Precision           | ≥0.92            | -                   |
-| Recall              | ≥0.88            | -                   |
-| mAP@50              | ≥0.90            | -                   |
-| Dice Score          | -                | ≥0.85               |
-| HD95 (mm)           | -                | ≤3.5                |
-| Inference Time (ms) | ≤35              | ≤60                 |
+```bash
+# Run YOLOv8 detection training
+python -c "from ultralytics import YOLO; YOLO('yolov8m.pt').train(data='config/data.yaml', epochs=100)"
+
+# Run 3D U-Net segmentation (via notebook)
+jupyter notebook notebooks/3_model_training_&_prediction.ipynb
+```
+
+### Inference
+
+```bash
+# Launch the Streamlit web interface
+streamlit run app.py
+```
 
 ---
 
 ## 💡 Future Directions
 
-- Multimodal fusion with clinical and CT scan metadata
-- Semi-supervised learning to reduce labeling effort
-- DICOM integration for hospital deployment
-- Real-time diagnostic tool development
+- Multimodal fusion with CT and clinical metadata
+- Transformer-based 3D segmentation (e.g., SwinUNETR)
+- Integration with DICOM for hospital workflow testing
+- Lightweight models for edge inference on MR workstations
+- Survival prediction based on tumor characteristics
 
 ---
 
@@ -202,12 +232,15 @@ brain_tumor_detection_project/
 - DRDO-INMAS mentorship and infrastructure
 - Medical imaging community for open datasets
 - Ultralytics team for YOLOv8 framework
+- BraTS organizers and contributors
 
 ---
 
 ## 📚 References
 
-1. [BraTS 2020](https://www.med.upenn.edu/brats20)
-2. [YOLOv8 Docs](https://docs.ultralytics.com)
-3. [3D Slicer](https://www.slicer.org)
-4. [SAM-Med2D](https://github.com/OpenGVLab/SAM-Med2D)
+1. [BraTS 2020 Dataset](https://www.kaggle.com/datasets/awsaf49/brats20-dataset-training-validation)
+2. [YOLOv8 Documentation](https://docs.ultralytics.com)
+3. [ITK-SNAP](http://www.itksnap.org)
+4. [3D U-Net: Learning Dense Volumetric Segmentation from Sparse Annotation](https://arxiv.org/abs/1606.06650)
+5. [Kaggle Tumor Detection Dataset](https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-detection)
+
