@@ -56,6 +56,76 @@ The architecture shows the complete pipeline from data ingestion through detecti
 | Kaggle MRI   | T2-weighted            | 2,176   | 2D slices, 3 tumor types ([Kaggle Link](https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-detection)) |
 | BraTS 2020   | T1, T1CE, T2, FLAIR    | 369     | Multimodal 3D volumes with ground-truth segmentations ([BraTS 2020 Dataset on Kaggle](https://www.kaggle.com/datasets/awsaf49/brats20-dataset-training-validation)) |
 
+### Kaggle MRI Dataset Details
+
+This dataset contains 2D MRI images for brain tumor detection and classification, serving as an excellent resource for 2D deep learning models such as YOLOv8 to identify tumor regions in radiological images.
+
+#### Kaggle Dataset Features
+
+- **Tumor Types**: Three classes of brain tumors: Glioma, Meningioma, and Pituitary
+- **Modality**: Primarily T2-weighted MRI axial slices
+- **Annotations**: Bounding box annotations suitable for object detection models
+- **Clinical Application**: Tumor localization and classification in diagnostic workflows
+
+#### Kaggle Dataset Composition
+
+- **2D Images**: 2,176 MRI slices across all tumor types
+- **Format**: JPG images (pre-processed from DICOM)
+- **Resolution**: Standardized to support deep learning (640×640 for YOLOv8 training)
+- **Distribution**: Balanced representation of the three tumor classes
+
+#### Dataset Structure
+
+```bash
+BrainTumorYolov8/
+├── train/
+│   ├── images/  # Training MRI slices
+│   └── labels/  # YOLO format annotations (.txt)
+├── valid/
+│   ├── images/  # Validation MRI slices
+│   └── labels/  # YOLO format annotations (.txt)
+└── test/
+    └── images/  # Test MRI slices
+```
+
+#### Preprocessing Steps
+
+1. **Standardization**: Resize to consistent dimensions
+2. **Contrast Enhancement**: Improve tumor visibility
+3. **Annotation Conversion**: Convert to YOLO-compatible format
+4. **Data Augmentation**: Rotations, flips, contrast adjustments
+
+### BraTS 2020 Dataset Details
+
+The BraTS 2020 dataset is the gold standard for brain tumor segmentation research, curated by clinical experts and used in the annual MICCAI BraTS challenge. It provides standardized, multi-institutional data for developing AI solutions in neuro-oncology.
+
+#### Key Features
+
+- **Tumor Types**: Gliomas (High-Grade and Low-Grade Gliomas)
+- **Modalities**: T1, T1CE (Contrast-Enhanced T1), T2, FLAIR
+- **Annotations**: Expert-labeled segmentation masks for tumor subregions
+- **Clinical Relevance**: Used for treatment planning and therapy response
+
+#### Dataset Composition
+
+- **3D Volumes**: 369 patients (259 training + 110 validation)
+- **Resolution**: 240×240×155 voxels @ 1mm³ isotropic resolution
+- **Quality**: Multi-institutional data from 19+ medical centers, skull-stripped, co-registered, and resampled
+
+#### Segmentation Labels
+
+- **Label 0**: Background
+- **Label 1**: Necrotic core
+- **Label 2**: Edema
+- **Label 4**: Enhancing tumor
+
+#### Preprocessing Requirements
+
+1. **Label Correction**: Map label 4 → 3 for framework compatibility
+2. **Intensity Normalization**: Per-modality Z-score normalization
+3. **Patch Extraction**: 128×128×128 voxel patches for training
+4. **Data Augmentation**: 3D rotations, flips, gamma adjustments
+
 ---
 
 ## 🧠 Progressive Model Development
@@ -86,7 +156,7 @@ The architecture shows the complete pipeline from data ingestion through detecti
 ### 🧠 Stage 2: 3D Semantic Segmentation with 3D U-Net
 
 - Dataset: BraTS 2020 (multimodal MRI volumes)
-- Modalities: T1, T1Gd, T2, FLAIR
+- Modalities: T1, T1ce, T2, FLAIR
 - Architecture: **3D U-Net**
 - Preprocessing:
   - Intensity normalization
